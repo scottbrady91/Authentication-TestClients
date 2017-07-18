@@ -40,7 +40,7 @@ namespace TestClient.Oidc.AspNetCore1
             {
                 Authority = "http://localhost:3000",
                 ClientId = "test_implicit_app",
-                ResponseType = "id_token",
+                ResponseType = "id_token token",
                 Scope = {"openid", "profile"},
                 RequireHttpsMetadata = false,
                 SignInScheme = "cookie"
