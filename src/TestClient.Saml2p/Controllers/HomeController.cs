@@ -22,5 +22,12 @@ namespace TestClient.Saml2p.Controllers
 
             return Redirect("Index");
         }
+
+        public ActionResult Logout()
+        {
+            Request.GetOwinContext().Authentication.SignOut();
+
+            return Redirect("Index");
+        }
     }
 }
