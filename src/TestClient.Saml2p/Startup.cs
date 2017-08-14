@@ -20,22 +20,24 @@ namespace TestClient.Saml2p
         {
             app.UseCookieAuthentication(new CookieAuthenticationOptions {AuthenticationType = "cookie"});
 
+            var spOptions = new SPOptions {EntityId = new EntityId("http://localhost:4100/AuthServices")};
+            spOptions.AuthenticateRequestSigningBehavior = SigningBehavior.Always;
+            spOptions.ServiceCertificates.Add(new X509Certificate2(HostingEnvironment.MapPath("~/idsrv3test.pfx"), "idsrv3test"));
+
             var options = new KentorAuthServicesAuthenticationOptions(false)
             {
-                SPOptions = new SPOptions {EntityId = new EntityId("http://localhost:4100/AuthServices"), },
+                SPOptions = spOptions,
                 AuthenticationType = "saml2p",
                 SignInAsAuthenticationType = "cookie"
             };
 
-
             var idp = new IdentityProvider(new EntityId("http://stubidp.kentor.se/Metadata"), options.SPOptions)
             {
-                AllowUnsolicitedAuthnResponse = true,
-                Binding = Saml2BindingType.HttpPost,
-                SingleSignOnServiceUrl = new Uri("http://stubidp.kentor.se")
+                SingleSignOnServiceUrl = new Uri("http://stubidp.kentor.se"),
+                Binding = Saml2BindingType.HttpRedirect,
+                WantAuthnRequestsSigned = true
             };
-            idp.SigningKeys.AddConfiguredKey(
-                new X509Certificate2(HostingEnvironment.MapPath("~/Kentor.AuthServices.StubIdp.cer")));
+            idp.SigningKeys.AddConfiguredKey(new X509Certificate2(HostingEnvironment.MapPath("~/Kentor.AuthServices.StubIdp.cer")));
             options.IdentityProviders.Add(idp);
 
             app.UseKentorAuthServicesAuthentication(options);
